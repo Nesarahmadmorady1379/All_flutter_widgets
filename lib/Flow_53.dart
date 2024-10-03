@@ -44,6 +44,28 @@ class _Flow53State extends State<Flow53> with TickerProviderStateMixin {
         appBar: AppBar(),
         body: Flow(
           delegate: flowMenuDelegate(menuAnimation: menuAnimation),
+          children: menuItems
+              .map<Widget>((IconData icon) => Padding(
+                    padding: EdgeInsets.all(8),
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        if (icon != Icons.menu) {
+                          setState(() {
+                            lastIconclicked = icon;
+                          });
+                        }
+                        menuAnimation.status == AnimationStatus.completed
+                            ? menuAnimation.reverse()
+                            : menuAnimation.forward();
+                      },
+                      backgroundColor: lastIconclicked == icon
+                          ? Colors.orangeAccent
+                          : Colors.grey,
+                      splashColor: Colors.orangeAccent,
+                      child: Icon(icon),
+                    ),
+                  ))
+              .toList(),
         ));
   }
 }
@@ -62,7 +84,8 @@ class flowMenuDelegate extends FlowDelegate {
     double dx = 0.0;
     for (int i = 0; i < context.childCount; i++) {
       dx = context.getChildSize(i)!.width * i;
-      context.paintChild(i,transform: Matrix4.translationValues(dx))
+      context.paintChild(i,
+          transform: Matrix4.translationValues(dx * menuAnimation.value, 0, 0));
     }
   }
 }
